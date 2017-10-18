@@ -1,0 +1,137 @@
+Number of training instances: 812
+Number of test instances: 7312
+IF #5 = f THEN p
+Coverage: 208 instances 25.62% of all instances
+IF #9 = h THEN e
+Coverage: 20 instances 2.46% of all instances
+IF #21 = y THEN e
+Coverage: 114 instances 14.04% of all instances
+IF #14 = g THEN e
+Coverage: 30 instances 3.69% of all instances
+IF #5 = y THEN p
+Coverage: 54 instances 6.65% of all instances
+IF #13 = f THEN e
+Coverage: 29 instances 3.57% of all instances
+IF #14 = o THEN e
+Coverage: 21 instances 2.59% of all instances
+IF #5 = s THEN p
+Coverage: 54 instances 6.65% of all instances
+IF #22 = w THEN e
+Coverage: 28 instances 3.45% of all instances
+IF #5 = p THEN p
+Coverage: 27 instances 3.33% of all instances
+IF #10 = t THEN e
+Coverage: 87 instances 10.71% of all instances
+IF #5 = m THEN p
+Coverage: 6 instances 0.74% of all instances
+IF #21 = n THEN e
+Coverage: 46 instances 5.67% of all instances
+IF #22 = d THEN p
+Coverage: 23 instances 2.83% of all instances
+IF #1 = x THEN e
+Coverage: 27 instances 3.33% of all instances
+IF #5 = a THEN e
+Coverage: 10 instances 1.23% of all instances
+IF #2 = f THEN e
+Coverage: 7 instances 0.86% of all instances
+IF #3 = y THEN e
+Coverage: 5 instances 0.62% of all instances
+IF #9 = r THEN p
+Coverage: 2 instances 0.25% of all instances
+IF #4 = f THEN e
+Coverage: 2 instances 0.25% of all instances
+IF #1 = k THEN p
+Coverage: 1 instances 0.12% of all instances
+IF #3 = p THEN p
+Coverage: 1 instances 0.12% of all instances
+IF #7 = w THEN p
+Coverage: 1 instances 0.12% of all instances
+IF #1 = f THEN e
+Coverage: 2 instances 0.25% of all instances
+IF #5 = l THEN e
+Coverage: 3 instances 0.37% of all instances
+IF #1 = b THEN p
+Coverage: 4 instances 0.49% of all instances
+Number of derived rules: 26
+--------------------------------------------------------------------------------
+
+Detailed metrics for using the rules on the test dataset:
+IF #5 = f THEN p
+Coverage: 1952 instances 26.70% of all instances
+Precision: 100.00%
+IF #9 = h THEN e
+Coverage: 184 instances 2.52% of all instances
+Precision: 100.00%
+IF #21 = y THEN e
+Coverage: 944 instances 12.91% of all instances
+Precision: 100.00%
+IF #14 = g THEN e
+Coverage: 258 instances 3.53% of all instances
+Precision: 100.00%
+IF #5 = y THEN p
+Coverage: 522 instances 7.14% of all instances
+Precision: 100.00%
+IF #13 = f THEN e
+Coverage: 301 instances 4.12% of all instances
+Precision: 100.00%
+IF #14 = o THEN e
+Coverage: 171 instances 2.34% of all instances
+Precision: 100.00%
+IF #5 = s THEN p
+Coverage: 522 instances 7.14% of all instances
+Precision: 100.00%
+IF #22 = w THEN e
+Coverage: 164 instances 2.24% of all instances
+Precision: 100.00%
+IF #5 = p THEN p
+Coverage: 229 instances 3.13% of all instances
+Precision: 100.00%
+IF #10 = t THEN e
+Coverage: 873 instances 11.94% of all instances
+Precision: 100.00%
+IF #5 = m THEN p
+Coverage: 30 instances 0.41% of all instances
+Precision: 100.00%
+IF #21 = n THEN e
+Coverage: 354 instances 4.84% of all instances
+Precision: 100.00%
+IF #22 = d THEN p
+Coverage: 201 instances 2.75% of all instances
+Precision: 100.00%
+IF #1 = x THEN e
+Coverage: 229 instances 3.13% of all instances
+Precision: 100.00%
+IF #5 = a THEN e
+Coverage: 78 instances 1.07% of all instances
+Precision: 100.00%
+IF #2 = f THEN e
+Coverage: 81 instances 1.11% of all instances
+Precision: 100.00%
+IF #3 = y THEN e
+Coverage: 47 instances 0.64% of all instances
+Precision: 82.98%
+IF #9 = r THEN p
+Coverage: 22 instances 0.30% of all instances
+Precision: 100.00%
+IF #4 = f THEN e
+Coverage: 54 instances 0.74% of all instances
+Precision: 100.00%
+IF #1 = k THEN p
+Coverage: 1 instances 0.01% of all instances
+Precision: 100.00%
+IF #3 = p THEN p
+Coverage: 17 instances 0.23% of all instances
+Precision: 88.24%
+IF #7 = w THEN p
+Coverage: 5 instances 0.07% of all instances
+Precision: 100.00%
+IF #1 = f THEN e
+Coverage: 32 instances 0.44% of all instances
+Precision: 50.00%
+IF #5 = l THEN e
+Coverage: 29 instances 0.40% of all instances
+Precision: 100.00%
+IF #1 = b THEN p
+Coverage: 12 instances 0.16% of all instances
+Precision: 100.00%
+Accuracy on test dataset: 99.64%

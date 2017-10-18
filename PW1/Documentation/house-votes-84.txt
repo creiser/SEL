@@ -1,0 +1,32 @@
+Number of training instances: 43
+Number of test instances: 392
+IF #4 = n THEN democrat
+Coverage: 20 instances 46.51% of all instances
+IF #3 = n THEN republican
+Coverage: 18 instances 41.86% of all instances
+IF #10 = y THEN republican
+Coverage: 3 instances 6.98% of all instances
+IF #1 = y THEN democrat
+Coverage: 1 instances 2.33% of all instances
+IF #1 = n THEN democrat
+Coverage: 1 instances 2.33% of all instances
+Number of derived rules: 5
+--------------------------------------------------------------------------------
+
+Detailed metrics for using the rules on the test dataset:
+IF #4 = n THEN democrat
+Coverage: 227 instances 57.91% of all instances
+Precision: 99.12%
+IF #3 = n THEN republican
+Coverage: 128 instances 32.65% of all instances
+Precision: 95.31%
+IF #10 = y THEN republican
+Coverage: 21 instances 5.36% of all instances
+Precision: 71.43%
+IF #1 = y THEN democrat
+Coverage: 6 instances 1.53% of all instances
+Precision: 66.67%
+IF #1 = n THEN democrat
+Coverage: 6 instances 1.53% of all instances
+Precision: 33.33%
+Accuracy on test dataset: 93.88%

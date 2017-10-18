@@ -1,2 +1,1 @@
-# SEL
-Project work for SUPERVISED AND EXPERIENTIAL LEARNING course at UPC
+

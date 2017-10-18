@@ -1,8 +1,12 @@
+# Example usage:
+# python ./rules.py ../Data/house-votes-84.data -t 0.9 -c first -pm
+# python ./rules.py ../Data/agaricus-lepiota.data -t 0.9 -c first -pm
+# python ./rules.py ../Data/car.data -t 0.9 -c last -pm
+
 import numpy as np
 import pandas as pd
 import itertools
 import argparse
-
 
 def percentage_type(x):
     x = float(x)
@@ -28,13 +32,6 @@ parser.add_argument('-pm', '--print_metrics',
                     action='store_true')
 args = parser.parse_args()
 
-# COMMAND LINE ARGUMENTS #
-#file_name, class_index = '../Data/contact-lenses.csv', 4
-#file_name, class_index = '../Data/balance-scale.data', 0
-#file_name, class_index = '../Data/car.data', 6
-#file_name, class_index = '../Data/nursery.data', 8
-#file_name, class_index = '../Data/agaricus-lepiota.data', 0
-
 dataset = pd.read_csv(args.file_name, sep=',', header=None).values
 num_rows, num_cols = np.shape(dataset)
 num_test_rows = int(round(args.test_percentage * num_rows))
@@ -57,10 +54,10 @@ print('Number of test instances: ' + str(num_test_rows))
 
 
 def print_rule(feature_combination, attribute_values, assigned_class):
-    out = ''
+    out = 'IF '
     for feature_index, attribute_value in zip(feature_combination, attribute_values):
-        out += '#' + str(feature_index) + ' = ' + str(attribute_value) + ' ∧ '
-    print(out[:-2] + '⇒ ' + str(assigned_class))
+        out += '#' + str(feature_index) + ' = ' + str(attribute_value) + ' AND '
+    print(out[:-4] + 'THEN ' + str(assigned_class))
 
 # Data structure for a rule. Tuple (feature_combination, attribute_values, assigned_class)
 # where feature_combination: list of indices of the involved features

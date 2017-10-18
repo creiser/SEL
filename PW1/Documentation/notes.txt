@@ -1,9 +1,0 @@
-http://archive.ics.uci.edu/ml/datasets/Car+Evaluation
-http://archive.ics.uci.edu/ml/datasets/Balance+Scale
-http://archive.ics.uci.edu/ml/datasets/Nursery
-
-RULES-1:
-- sort rules with same number of attributes by coverage and create rules with higher coverage first
-- remove redundant rules ???
-
-RULES-2

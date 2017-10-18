@@ -1,0 +1,187 @@
+Number of training instances: 173
+Number of test instances: 1555
+IF #3 = 2 THEN unacc
+Coverage: 46 instances 26.59% of all instances
+IF #0 = low AND #2 = 2 AND #5 = high THEN vgood
+Coverage: 1 instances 0.58% of all instances
+IF #0 = high AND #1 = vhigh THEN unacc
+Coverage: 6 instances 3.47% of all instances
+IF #0 = vhigh AND #1 = vhigh THEN unacc
+Coverage: 9 instances 5.20% of all instances
+IF #5 = low THEN unacc
+Coverage: 29 instances 16.76% of all instances
+IF #0 = high AND #1 = high AND #5 = high THEN acc
+Coverage: 2 instances 1.16% of all instances
+IF #0 = med AND #1 = low AND #2 = 4 THEN good
+Coverage: 2 instances 1.16% of all instances
+IF #0 = high AND #1 = med THEN acc
+Coverage: 4 instances 2.31% of all instances
+IF #0 = high AND #4 = big THEN acc
+Coverage: 4 instances 2.31% of all instances
+IF #0 = low AND #1 = high AND #4 = big THEN vgood
+Coverage: 1 instances 0.58% of all instances
+IF #0 = vhigh AND #1 = high THEN unacc
+Coverage: 8 instances 4.62% of all instances
+IF #0 = vhigh AND #5 = high THEN acc
+Coverage: 4 instances 2.31% of all instances
+IF #0 = high AND #2 = 3 THEN acc
+Coverage: 2 instances 1.16% of all instances
+IF #0 = vhigh AND #4 = small THEN unacc
+Coverage: 2 instances 1.16% of all instances
+IF #0 = high AND #3 = 4 THEN unacc
+Coverage: 2 instances 1.16% of all instances
+IF #0 = low AND #1 = med AND #5 = high THEN good
+Coverage: 1 instances 0.58% of all instances
+IF #1 = low AND #2 = 3 THEN vgood
+Coverage: 2 instances 1.16% of all instances
+IF #0 = med AND #2 = 4 THEN acc
+Coverage: 3 instances 1.73% of all instances
+IF #0 = high AND #1 = low AND #4 = med THEN acc
+Coverage: 2 instances 1.16% of all instances
+IF #0 = vhigh AND #2 = 5more THEN acc
+Coverage: 1 instances 0.58% of all instances
+IF #0 = vhigh AND #2 = 4 THEN acc
+Coverage: 2 instances 1.16% of all instances
+IF #1 = med AND #4 = small THEN acc
+Coverage: 4 instances 2.31% of all instances
+IF #1 = high AND #4 = small THEN acc
+Coverage: 4 instances 2.31% of all instances
+IF #1 = vhigh AND #4 = big THEN acc
+Coverage: 1 instances 0.58% of all instances
+IF #0 = med AND #1 = high THEN acc
+Coverage: 5 instances 2.89% of all instances
+IF #0 = med AND #2 = 2 THEN acc
+Coverage: 1 instances 0.58% of all instances
+IF #0 = vhigh AND #1 = low THEN unacc
+Coverage: 1 instances 0.58% of all instances
+IF #2 = 5more AND #5 = high THEN vgood
+Coverage: 4 instances 2.31% of all instances
+IF #0 = low AND #1 = med THEN good
+Coverage: 2 instances 1.16% of all instances
+IF #1 = med AND #5 = med THEN acc
+Coverage: 3 instances 1.73% of all instances
+IF #0 = high THEN unacc
+Coverage: 4 instances 2.31% of all instances
+IF #1 = low THEN good
+Coverage: 4 instances 2.31% of all instances
+IF #0 = low AND #3 = 4 THEN acc
+Coverage: 3 instances 1.73% of all instances
+IF #0 = low THEN unacc
+Coverage: 2 instances 1.16% of all instances
+IF #1 = vhigh THEN unacc
+Coverage: 1 instances 0.58% of all instances
+IF #0 = med THEN vgood
+Coverage: 1 instances 0.58% of all instances
+Number of derived rules: 36
+--------------------------------------------------------------------------------
+
+Detailed metrics for using the rules on the test dataset:
+IF #3 = 2 THEN unacc
+Coverage: 530 instances 34.08% of all instances
+Precision: 100.00%
+IF #0 = low AND #2 = 2 AND #5 = high THEN vgood
+Coverage: 23 instances 1.48% of all instances
+Precision: 21.74%
+IF #0 = high AND #1 = vhigh THEN unacc
+Coverage: 66 instances 4.24% of all instances
+Precision: 100.00%
+IF #0 = vhigh AND #1 = vhigh THEN unacc
+Coverage: 63 instances 4.05% of all instances
+Precision: 100.00%
+IF #5 = low THEN unacc
+Coverage: 307 instances 19.74% of all instances
+Precision: 100.00%
+IF #0 = high AND #1 = high AND #5 = high THEN acc
+Coverage: 22 instances 1.41% of all instances
+Precision: 95.45%
+IF #0 = med AND #1 = low AND #2 = 4 THEN good
+Coverage: 10 instances 0.64% of all instances
+Precision: 40.00%
+IF #0 = high AND #1 = med THEN acc
+Coverage: 44 instances 2.83% of all instances
+Precision: 72.73%
+IF #0 = high AND #4 = big THEN acc
+Coverage: 20 instances 1.29% of all instances
+Precision: 100.00%
+IF #0 = low AND #1 = high AND #4 = big THEN vgood
+Coverage: 13 instances 0.84% of all instances
+Precision: 38.46%
+IF #0 = vhigh AND #1 = high THEN unacc
+Coverage: 40 instances 2.57% of all instances
+Precision: 100.00%
+IF #0 = vhigh AND #5 = high THEN acc
+Coverage: 44 instances 2.83% of all instances
+Precision: 95.45%
+IF #0 = high AND #2 = 3 THEN acc
+Coverage: 10 instances 0.64% of all instances
+Precision: 40.00%
+IF #0 = vhigh AND #4 = small THEN unacc
+Coverage: 14 instances 0.90% of all instances
+Precision: 100.00%
+IF #0 = high AND #3 = 4 THEN unacc
+Coverage: 16 instances 1.03% of all instances
+Precision: 37.50%
+IF #0 = low AND #1 = med AND #5 = high THEN good
+Coverage: 17 instances 1.09% of all instances
+Precision: 35.29%
+IF #1 = low AND #2 = 3 THEN vgood
+Coverage: 26 instances 1.67% of all instances
+Precision: 15.38%
+IF #0 = med AND #2 = 4 THEN acc
+Coverage: 33 instances 2.12% of all instances
+Precision: 75.76%
+IF #0 = high AND #1 = low AND #4 = med THEN acc
+Coverage: 4 instances 0.26% of all instances
+Precision: 75.00%
+IF #0 = vhigh AND #2 = 5more THEN acc
+Coverage: 7 instances 0.45% of all instances
+Precision: 100.00%
+IF #0 = vhigh AND #2 = 4 THEN acc
+Coverage: 6 instances 0.39% of all instances
+Precision: 100.00%
+IF #1 = med AND #4 = small THEN acc
+Coverage: 16 instances 1.03% of all instances
+Precision: 81.25%
+IF #1 = high AND #4 = small THEN acc
+Coverage: 25 instances 1.61% of all instances
+Precision: 56.00%
+IF #1 = vhigh AND #4 = big THEN acc
+Coverage: 25 instances 1.61% of all instances
+Precision: 100.00%
+IF #0 = med AND #1 = high THEN acc
+Coverage: 19 instances 1.22% of all instances
+Precision: 84.21%
+IF #0 = med AND #2 = 2 THEN acc
+Coverage: 27 instances 1.74% of all instances
+Precision: 40.74%
+IF #0 = vhigh AND #1 = low THEN unacc
+Coverage: 3 instances 0.19% of all instances
+Precision: 33.33%
+IF #2 = 5more AND #5 = high THEN vgood
+Coverage: 23 instances 1.48% of all instances
+Precision: 43.48%
+IF #0 = low AND #1 = med THEN good
+Coverage: 14 instances 0.90% of all instances
+Precision: 78.57%
+IF #1 = med AND #5 = med THEN acc
+Coverage: 13 instances 0.84% of all instances
+Precision: 76.92%
+IF #0 = high THEN unacc
+Coverage: 4 instances 0.26% of all instances
+Precision: 25.00%
+IF #1 = low THEN good
+Coverage: 26 instances 1.67% of all instances
+Precision: 46.15%
+IF #0 = low AND #3 = 4 THEN acc
+Coverage: 15 instances 0.96% of all instances
+Precision: 53.33%
+IF #0 = low THEN unacc
+Coverage: 16 instances 1.03% of all instances
+Precision: 18.75%
+IF #1 = vhigh THEN unacc
+Coverage: 11 instances 0.71% of all instances
+Precision: 36.36%
+IF #0 = med THEN vgood
+Coverage: 3 instances 0.19% of all instances
+Precision: 66.67%
+Accuracy on test dataset: 86.88%
