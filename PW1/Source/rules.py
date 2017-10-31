@@ -19,7 +19,7 @@ parser.add_argument('file_name',
                     help='.csv file that both contain training and test data.', type=str)
 parser.add_argument('-c', '--class_index',
                     help='Index of the column that contains the class label. Use "first" respective "last" to specify'
-                         'the class label is in the first respective the last column. Default: "last"',
+                         ' the class label is in the first respective the last column. Default: "last"',
                     type=str, default='last')
 parser.add_argument('-t', '--test_percentage',
                     help='Percentage from 0.0 to 1.0 of the dataset that will be used for testing. Default: 0.1',
@@ -32,7 +32,9 @@ parser.add_argument('-pm', '--print_metrics',
                     action='store_true')
 args = parser.parse_args()
 
-dataset = pd.read_csv(args.file_name, sep=',', header=None).values
+dataset = pd.read_csv(args.file_name, sep=',')
+header = list(dataset)
+dataset = dataset.values
 num_rows, num_cols = np.shape(dataset)
 num_test_rows = int(round(args.test_percentage * num_rows))
 num_training_rows = num_rows - num_test_rows
@@ -56,7 +58,7 @@ print('Number of test instances: ' + str(num_test_rows))
 def print_rule(feature_combination, attribute_values, assigned_class):
     out = 'IF '
     for feature_index, attribute_value in zip(feature_combination, attribute_values):
-        out += '#' + str(feature_index) + ' = ' + str(attribute_value) + ' AND '
+        out += header[feature_index] + ' = ' + str(attribute_value) + ' AND '
     print(out[:-4] + 'THEN ' + str(assigned_class))
 
 # Data structure for a rule. Tuple (feature_combination, attribute_values, assigned_class)
