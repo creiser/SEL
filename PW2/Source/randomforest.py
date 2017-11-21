@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import itertools
 import argparse
+import math
 
 def percentage_type(x):
     x = float(x)
@@ -54,126 +55,114 @@ test = dataset[:num_test_rows]
 print('Number of training instances: ' + str(num_training_rows))
 print('Number of test instances: ' + str(num_test_rows))
 
+asubtree = {}
+atree = {'attribute_index' : 0, 'leaves' : {'blue' : '+', 'red' : asubtree}}
+
+# TODO: Make sure that everything is a str.
 
 
+def create_attribute_subsets(subset, attribute_index):
+    attribute_subsets = {}
+    for sample in subset:
+        if sample[attribute_index] in attribute_subsets:
+            attribute_subsets[sample[attribute_index]].append(sample)
+        else:
+            attribute_subsets[sample[attribute_index]] = [sample]
+    return attribute_subsets
 
 
+def create_class_counts(subset):
+    class_counts = {}
+    for sample in subset:
+        if sample[class_index] in class_counts:
+            class_counts[sample[class_index]] += 1
+        else:
+            class_counts[sample[class_index]] = 1
+    return class_counts
 
 
+def get_most_common_class(subset):
+    max_class_count, most_common_class = -1, ''
+    class_counts = create_class_counts(subset)
+    for the_class, class_count in class_counts.items():
+        if class_count > max_class_count:
+            max_class_count, most_common_class = class_count, the_class
+    return most_common_class
 
 
+# Aggregate all the attribute values
+attribute_values = [None] * num_cols
+for attribute_index in feature_indices:
+    attribute_values[attribute_index] = list(set([x[attribute_index] for x in dataset]))
+
+def build_tree(subset, unused_attributes):
+    # If all elements of subset are in the same class
+    if len(set([x[class_index] for x in subset])) == 1:
+        return subset[0][class_index]
+
+    if len(unused_attributes) == 0:
+        # Get most common class
+        return get_most_common_class(subset)
+
+    min_index, min_entropy = 0, 100000000
+    for attribute_index in unused_attributes:
+        # Create subsets for that given attribute
+        attribute_subsets = create_attribute_subsets(subset, attribute_index)
+
+        # Calculate entropy of the generated subsets
+        entropy = 0
+        for attribute_subset in attribute_subsets.values():
+            class_counts = create_class_counts(attribute_subset)
+
+            attribute_subset_entropy = 0
+            for class_count in class_counts.values():
+                p_x = class_count / len(attribute_subset)
+                attribute_subset_entropy -= p_x * math.log(p_x)
+
+            entropy += (len(attribute_subset) / len(subset)) * attribute_subset_entropy
+
+        # Minimum
+        if entropy < min_entropy:
+            min_index, min_entropy = attribute_index, entropy
+
+    unused_attributes.remove(min_index)
+
+    # Reconstruct subsets of best attribute and use them to build subtrees recursively
+    attribute_subsets = create_attribute_subsets(subset, min_index)
+    tree = {'attribute_index': min_index, 'subtrees': {}}
+
+    # Make sure to add for all values that exist in the training dataset labels
+    most_common_class = None
+    for attribute_value in attribute_values[min_index]:
+        if attribute_value in attribute_subsets and len(attribute_subsets[attribute_value]):
+            tree['subtrees'][attribute_value] = build_tree(attribute_subsets[attribute_value], unused_attributes)
+        else:
+            if not most_common_class:
+                most_common_class = get_most_common_class(subset)
+            tree['subtrees'][attribute_value] = most_common_class
+
+    return tree
 
 
+def classify(example, tree):
+    if isinstance(tree, str):
+        return tree
+    else:
+        return classify(example, tree['subtrees'][example[tree['attribute_index']]])
 
 
+def pretty_tree(tree):
+    if isinstance(tree, str):
+        return tree
+    else:
+        pretty_subtrees = {}
+        for attribute_value, subtree in tree['subtrees'].items():
+            pretty_subtrees[attribute_value] = pretty_tree(subtree)
+        return { 'attribute_index' : header[tree['attribute_index']], 'subtrees' : pretty_subtrees}
 
+the_tree = build_tree(training, feature_indices)
+print(pretty_tree(the_tree))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if False:
-    def print_rule(feature_combination, attribute_values, assigned_class):
-        out = 'IF '
-        for feature_index, attribute_value in zip(feature_combination, attribute_values):
-            out += header[feature_index] + ' = ' + str(attribute_value) + ' AND '
-        print(out[:-4] + 'THEN ' + str(assigned_class))
-
-    # Data structure for a rule. Tuple (feature_combination, attribute_values, assigned_class)
-    # where feature_combination: list of indices of the involved features
-    # attribute_values = values of these features
-    # assigned_class = class that is assigned to instance if it satisfies the condition
-    rules = []
-    unclassified = training # in the beginning the whole training set is unclassified
-
-    # Continue as long as there are unclassified examples.
-    while unclassified.shape[0]:
-        for num_combinations in range(1, num_cols):
-            all_in_same_class = None # just declare it outside the below loop so we can propagate the break
-            for feature_combination in itertools.combinations(feature_indices, num_combinations):
-                satisfy_indices = [0]
-                all_in_same_class = True
-                for index in range(1, unclassified.shape[0]):
-                    conditions_satisfied = True
-                    for feature_index in feature_combination:
-                        if unclassified[0][feature_index] != unclassified[index][feature_index]:
-                            conditions_satisfied = False
-                            break
-                    if conditions_satisfied:
-                        if unclassified[0][class_index] != unclassified[index][class_index]:
-                            all_in_same_class = False
-                            break
-                        satisfy_indices.append(index)
-
-                # Create a new rule only if all instances that satisfy the condition
-                # are in the same class
-                if all_in_same_class:
-                    new_rule = (feature_combination,
-                                [unclassified[0][feature_index] for feature_index in feature_combination],
-                                unclassified[0][class_index])
-                    print_rule(*new_rule)
-                    if args.print_metrics:
-                        # Printing the precision during training makes no sense since with this algorithm the precision
-                        # of each rule is 1.0
-                        print('Coverage: {} instances {:.2f}% of all instances'.
-                              format(len(satisfy_indices), 100 * len(satisfy_indices) / num_training_rows))
-                    rules.append(new_rule)
-                    # Delete all the examples that are covered by the new rule
-                    unclassified = np.delete(unclassified, satisfy_indices, 0)
-                    break
-            if all_in_same_class:
-                break
-
-    print('Number of derived rules: ' + str(len(rules)))
-
-
-    # Finally use our rules to predict class labels on the test dataset
-    num_classified_correctly = 0
-    rule_classified_correctly_arr = [0] * len(rules)
-    rule_used_arr = [0] * len(rules)
-    for instance in test:
-        for rule_index, rule in enumerate(rules):
-            condition_satisfied = True
-            for (x, y) in zip(rule[0], range(len(rule[0]))):
-                if instance[x] != rule[1][y]:
-                    condition_satisfied = False
-                    break
-            if condition_satisfied:
-                rule_used_arr[rule_index] += 1
-                # Compare the predicted label to the actual label
-                if instance[class_index] == rule[2]:
-                    num_classified_correctly += 1
-                    rule_classified_correctly_arr[rule_index] += 1
-                break
-
-    if args.print_metrics:
-        print('-' * 80 + '\n\nDetailed metrics for using the rules on the test dataset:')
-        for rule, rule_used, rule_classified_correctly in zip(rules, rule_used_arr, rule_classified_correctly_arr):
-            print_rule(*rule)
-            print('Coverage: {} instances {:.2f}% of all instances'.
-                  format(rule_used, 100 * rule_used / num_test_rows))
-            print('Precision: {:.2f}%'.format(100 * rule_classified_correctly / rule_used))
-
-    print('Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+num_classified_correctly = sum([classify(example, the_tree) ==
+                                example[class_index] for example in test])
+print('Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
