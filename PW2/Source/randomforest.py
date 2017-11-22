@@ -8,6 +8,7 @@ import pandas as pd
 import itertools
 import argparse
 import math
+import random
 
 def percentage_type(x):
     x = float(x)
@@ -31,6 +32,9 @@ parser.add_argument('-s', '--seed',
 parser.add_argument('-pm', '--print_metrics',
                     help='If set detailed metrics (precision, coverage) of each generated rule is printed.',
                     action='store_true')
+parser.add_argument('-nt', '--num_trees',
+                    help='Number of decision trees built. Default: 100',
+                    type=int, default=100)
 args = parser.parse_args()
 
 dataset = pd.read_csv(args.file_name, sep=',')
@@ -125,6 +129,8 @@ def build_tree(subset, unused_attributes):
         if entropy < min_entropy:
             min_index, min_entropy = attribute_index, entropy
 
+    # Copy list otherwise our passed feature_indices array will be modified.
+    unused_attributes = list(unused_attributes)
     unused_attributes.remove(min_index)
 
     # Reconstruct subsets of best attribute and use them to build subtrees recursively
@@ -150,6 +156,21 @@ def classify(example, tree):
     else:
         return classify(example, tree['subtrees'][example[tree['attribute_index']]])
 
+def majority_vote(example, trees):
+    votes = {}
+    for tree in trees:
+        prediction = classify(example, tree)
+        #print(prediction)
+        if prediction in votes:
+            votes[prediction] += 1
+        else:
+            votes[prediction] = 1
+    majority_prediction, max_vote = None, 0
+    for prediction, num_votes in votes.items():
+        if num_votes > max_vote:
+            majority_prediction, max_vote = prediction, num_votes
+    return majority_prediction
+
 
 def pretty_tree(tree):
     if isinstance(tree, str):
@@ -161,8 +182,20 @@ def pretty_tree(tree):
         return { 'attribute_index' : header[tree['attribute_index']], 'subtrees' : pretty_subtrees}
 
 the_tree = build_tree(training, feature_indices)
-print(pretty_tree(the_tree))
+#print(pretty_tree(the_tree))
 
 num_classified_correctly = sum([classify(example, the_tree) ==
                                 example[class_index] for example in test])
-print('Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+print('Single tree: Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+
+# Perform bootstrap aggregating: Build trees from multiple sample sets
+trees = []
+for i in range(args.num_trees):
+    bootstrap_sample_set = [random.choice(training) for j in range(len(training))]
+    trees.append(build_tree(bootstrap_sample_set, feature_indices))
+    #print(pretty_tree(trees[-1]))
+
+num_classified_correctly = sum([majority_vote(example, trees) ==
+                                example[class_index] for example in test])
+print('Bagging: Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+
