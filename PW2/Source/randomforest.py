@@ -1,14 +1,15 @@
 # Example usage:
-# python ./randomforest.py ../Data/house-votes-84.data -t 0.9 -c first -pm
-# python ./randomforest.py ../Data/agaricus-lepiota.data -t 0.9 -c first -pm
-# python ./randomforest.py ../Data/car.data -t 0.9 -c last -pm
+# python ./randomforest.py ../Data/house-votes-84.data -t 0.9 -c first
+# python ./randomforest.py ../Data/agaricus-lepiota.data -t 0.9 -c first
+# python ./randomforest.py ../Data/car.data -t 0.9 -c last
 
 import numpy as np
 import pandas as pd
-import itertools
 import argparse
 import math
-import random
+from random import Random
+import sys
+import operator
 
 def percentage_type(x):
     x = float(x)
@@ -29,12 +30,12 @@ parser.add_argument('-t', '--test_percentage',
 parser.add_argument('-s', '--seed',
                     help='Seed with which the random number generator is initialized. Default: 42',
                     type=int, default=42)
-parser.add_argument('-pm', '--print_metrics',
-                    help='If set detailed metrics (precision, coverage) of each generated rule is printed.',
-                    action='store_true')
 parser.add_argument('-nt', '--num_trees',
                     help='Number of decision trees built. Default: 100',
                     type=int, default=100)
+parser.add_argument('-fss', '--feature_subset_size',
+                    help='Number of features that are considered at each split as a candidate. Default: 3',
+                    type=int, default=3)
 args = parser.parse_args()
 
 dataset = pd.read_csv(args.file_name, sep=',')
@@ -54,15 +55,11 @@ class_index = args.class_index
 feature_indices = list(range(class_index)) + list(range(class_index + 1, num_cols))
 np.random.seed(args.seed)
 np.random.shuffle(dataset)
+random = Random(args.seed)
 training = dataset[num_test_rows:]
 test = dataset[:num_test_rows]
 print('Number of training instances: ' + str(num_training_rows))
 print('Number of test instances: ' + str(num_test_rows))
-
-asubtree = {}
-atree = {'attribute_index' : 0, 'leaves' : {'blue' : '+', 'red' : asubtree}}
-
-# TODO: Make sure that everything is a str.
 
 
 def create_attribute_subsets(subset, attribute_index):
@@ -94,13 +91,23 @@ def get_most_common_class(subset):
     return most_common_class
 
 
+def calculate_entropy(subset):
+    class_counts = create_class_counts(subset)
+    subset_entropy = 0
+    for class_count in class_counts.values():
+        p_x = float(class_count) / len(subset)
+        subset_entropy -= p_x * math.log(p_x)
+    return subset_entropy
+
+
 # Aggregate all the attribute values
 attribute_values = [None] * num_cols
 for attribute_index in feature_indices:
     attribute_values[attribute_index] = list(set([x[attribute_index] for x in dataset]))
 
-def build_tree(subset, unused_attributes):
-    # If all elements of subset are in the same class
+
+def build_tree(subset, unused_attributes, feature_subset_size):
+    # If all elements of subset are in the same class we can make this a leaf node
     if len(set([x[class_index] for x in subset])) == 1:
         return subset[0][class_index]
 
@@ -108,24 +115,23 @@ def build_tree(subset, unused_attributes):
         # Get most common class
         return get_most_common_class(subset)
 
-    min_index, min_entropy = 0, 100000000
-    for attribute_index in unused_attributes:
+    # Apply the random forest technique of only considering a subset of features here
+    # but only if we have enough features to begin with.
+    feature_subset = unused_attributes
+    if len(feature_subset) > feature_subset_size:
+        feature_subset = random.sample(feature_subset, feature_subset_size)
+
+    min_index, min_entropy = 0, sys.maxsize
+    for attribute_index in feature_subset:
         # Create subsets for that given attribute
         attribute_subsets = create_attribute_subsets(subset, attribute_index)
 
-        # Calculate entropy of the generated subsets
+        # Calculate entropy of the generated subsets and weight them according to their size
         entropy = 0
         for attribute_subset in attribute_subsets.values():
-            class_counts = create_class_counts(attribute_subset)
+            entropy += float(len(attribute_subset) / len(subset)) * calculate_entropy(attribute_subset)
 
-            attribute_subset_entropy = 0
-            for class_count in class_counts.values():
-                p_x = class_count / len(attribute_subset)
-                attribute_subset_entropy -= p_x * math.log(p_x)
-
-            entropy += (len(attribute_subset) / len(subset)) * attribute_subset_entropy
-
-        # Minimum
+        # Keep track of the split attribute with minimum entropy
         if entropy < min_entropy:
             min_index, min_entropy = attribute_index, entropy
 
@@ -134,14 +140,16 @@ def build_tree(subset, unused_attributes):
     unused_attributes.remove(min_index)
 
     # Reconstruct subsets of best attribute and use them to build subtrees recursively
+    # As a measure of feature importance we save the feature importance (information gain) here
     attribute_subsets = create_attribute_subsets(subset, min_index)
-    tree = {'attribute_index': min_index, 'subtrees': {}}
+    tree = {'attribute_index': min_index, 'subtrees': {}, 'information_gain': calculate_entropy(subset) - min_entropy}
 
     # Make sure to add for all values that exist in the training dataset labels
     most_common_class = None
     for attribute_value in attribute_values[min_index]:
         if attribute_value in attribute_subsets and len(attribute_subsets[attribute_value]):
-            tree['subtrees'][attribute_value] = build_tree(attribute_subsets[attribute_value], unused_attributes)
+            tree['subtrees'][attribute_value] = build_tree(attribute_subsets[attribute_value], unused_attributes,
+                                                           feature_subset_size)
         else:
             if not most_common_class:
                 most_common_class = get_most_common_class(subset)
@@ -156,11 +164,11 @@ def classify(example, tree):
     else:
         return classify(example, tree['subtrees'][example[tree['attribute_index']]])
 
+# Counts predictions of all trees in the forest and selects the one with the highest count
 def majority_vote(example, trees):
     votes = {}
     for tree in trees:
         prediction = classify(example, tree)
-        #print(prediction)
         if prediction in votes:
             votes[prediction] += 1
         else:
@@ -172,6 +180,7 @@ def majority_vote(example, trees):
     return majority_prediction
 
 
+# Translate attribute indices into human readable columns
 def pretty_tree(tree):
     if isinstance(tree, str):
         return tree
@@ -181,21 +190,62 @@ def pretty_tree(tree):
             pretty_subtrees[attribute_value] = pretty_tree(subtree)
         return { 'attribute_index' : header[tree['attribute_index']], 'subtrees' : pretty_subtrees}
 
-the_tree = build_tree(training, feature_indices)
+
+# Estimate importance of a feature by calculating the average information gain
+def get_feature_importance(tree, feature_importance):
+    if not isinstance(tree, str):
+        if header[tree['attribute_index']] in feature_importance:
+            feature_importance[header[tree['attribute_index']]].append(tree['information_gain'])
+        else:
+            feature_importance[header[tree['attribute_index']]] = [tree['information_gain']]
+        for subtree in tree['subtrees'].values():
+            get_feature_importance(subtree, feature_importance)
+
+
+# Feature importance of a forest is calculated by averaging the feature importances of the individual trees
+def get_feature_importance_for_forest(trees):
+    feature_importance = {}
+    for tree in trees:
+        get_feature_importance(tree, feature_importance)
+
+    # Average the information gains
+    for feature_name, importance in feature_importance.items():
+        feature_importance[feature_name] = float(sum(importance)) / len(importance)
+
+    # Finally sort feature importance in descending order
+    return sorted(feature_importance.items(), key=operator.itemgetter(1), reverse=True)
+
+
+# Use a single tree to test our ID3 algorithm.
+# We pass sys.maxsize so no random feature sampling is used.
+the_tree = build_tree(training, feature_indices, sys.maxsize)
 #print(pretty_tree(the_tree))
 
 num_classified_correctly = sum([classify(example, the_tree) ==
                                 example[class_index] for example in test])
-print('Single tree: Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+print('Single tree: Accuracy on test dataset: {:.2f}%'.format(float(100 * num_classified_correctly) / num_test_rows))
+
 
 # Perform bootstrap aggregating: Build trees from multiple sample sets
 trees = []
 for i in range(args.num_trees):
     bootstrap_sample_set = [random.choice(training) for j in range(len(training))]
-    trees.append(build_tree(bootstrap_sample_set, feature_indices))
-    #print(pretty_tree(trees[-1]))
+    trees.append(build_tree(bootstrap_sample_set, feature_indices, sys.maxsize))
 
 num_classified_correctly = sum([majority_vote(example, trees) ==
                                 example[class_index] for example in test])
-print('Bagging: Accuracy on test dataset: {:.2f}%'.format(100 * num_classified_correctly / num_test_rows))
+print('Bagging: Accuracy on test dataset: {:.2f}%'.format(float(100 * num_classified_correctly) / num_test_rows))
 
+# Random forest: Additionally select subset of features
+trees = []
+for i in range(args.num_trees):
+    bootstrap_sample_set = [random.choice(training) for j in range(len(training))]
+    trees.append(build_tree(bootstrap_sample_set, feature_indices, args.feature_subset_size))
+
+num_classified_correctly = sum([majority_vote(example, trees) ==
+                                example[class_index] for example in test])
+print('Random forest: Accuracy on test dataset: {:.2f}%'.format(float(100 * num_classified_correctly) / num_test_rows))
+
+# Print out feature importances
+for rank, feature_importance in enumerate(get_feature_importance_for_forest(trees)):
+    print(str(rank + 1) + ': ' + str(feature_importance[0]) + ' {:.3}'.format(feature_importance[1]))
