@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import sys
 
+
 class Cocktail:
     def __init__(self, title, ingredients, success):
         self.title = title
@@ -33,25 +34,29 @@ def find_most_similar(cocktails, desired_ingredients, undesired_ingredients):
             max_sim, most_similar = sim, cocktail
     return max_sim, most_similar
 
-def main():
-    # Load case base
-    tree = ET.parse('ccc_cocktails.xml')
-    root = tree.getroot()
 
+def extract_ingredients(root):
+    ingredients = set()
     for recipe in root:
         for ingredient in recipe.find('ingredients'):
+            ingredients.add(ingredient.attrib['food'].lower())
 
-    # Build dict with all ingredients and assign them a unique ID
-    # for easier handling
-    #ingredient_id = 0
-    #ingredient_dict = {}
-    #for recipe in root:
-    #    for ingredient in recipe.find('ingredients'):
-    #        food = ingredient.attrib['food'].lower()
-    #        if food not in ingredient_dict:
-    #            ingredient_dict[food] = ingredient_id
-    #            ingredient_id += 1
+    top_level_element = ET.Element('ingredients')
+    for ingredient in ingredients:
+        inner_element = ET.SubElement(top_level_element, 'ingredient')
+        inner_element.attrib['food'] = ingredient
+        inner_element.attrib['category'] = '' # category will be assigned in the file
+    ET.ElementTree(top_level_element).write("categories_raw.xml")
 
+
+def load_ingredient_categories():
+    ingredient_categories = {}
+    for ingredient in ET.parse('categories.xml').getroot():
+        ingredient_categories[ingredient.attrib['food']] = ingredient.attrib['category']
+    return ingredient_categories
+
+
+def build_case_base(root):
     # Extract all cocktails
     cocktails = []
     for recipe in root:
@@ -59,15 +64,27 @@ def main():
         for ingredient in recipe.find('ingredients'):
             food = ingredient.attrib['food'].lower()
             ingredients.append((ingredient.attrib['food'].lower(),
-                            ingredient.attrib['quantity'],
-                            ingredient.attrib['unit'], True))
-        cocktails.append(Cocktail(recipe.find('title').text, ingredients))
+                                ingredient.attrib['quantity'],
+                                ingredient.attrib['unit'], True))
+        cocktails.append(Cocktail(recipe.find('title').text, ingredients, True))
+    return cocktails
 
-    for cocktail in cocktails:
-        print(cocktail)
 
-    print('most similar')
-    print(find_most_similar(cocktails, ['orange juice', 'gin'], ['cointreau'])[1])
+def main():
+    # Load case base
+    tree = ET.parse('ccc_cocktails.xml')
+    root = tree.getroot()
+
+    extract_ingredients(root)
+    print(load_ingredient_categories())
+
+    cocktails = build_case_base(root)
+
+    #for cocktail in cocktails:
+    #    print(cocktail)
+
+    #print('most similar')
+    #print(find_most_similar(cocktails, ['orange juice', 'gin'], ['cointreau'])[1])
 
 if __name__ == '__main__':
     main()
