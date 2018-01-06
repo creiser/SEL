@@ -13,12 +13,14 @@ class Cocktail:
         self.success = success
 
     # Count number of matching ingredients with query
-    def similarity(self, desired_ingredients, undesired_ingredients):
+    def similarity(self, desired_ingredients, undesired_ingredients, ingredient_categories):
         if not self.success:
             return -sys.maxsize - 1
-        ingredient_set = self.get_ingredient_set()
-        return sum([1 if x in ingredient_set else 0 for x in desired_ingredients] +
-                    [-1 if x in ingredient_set else 0 for x in undesired_ingredients])
+        return -adapt_solution(self, desired_ingredients, undesired_ingredients, ingredient_categories, True)[1]
+        # Old distance measure:
+        #ingredient_set = self.get_ingredient_set()
+        #return sum([1 if x in ingredient_set else 0 for x in desired_ingredients] +
+        #            [-1 if x in ingredient_set else 0 for x in undesired_ingredients])
 
     def replace_ingredient(self, old, new, use_old_quantities=True):
         for i, ingredient in enumerate(self.ingredients):
@@ -48,10 +50,10 @@ class Cocktail:
         return out
 
 
-def find_most_similar(cocktails, desired_ingredients, undesired_ingredients):
+def find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories):
     max_sim, most_similar = -sys.maxsize - 1, None
     for cocktail in cocktails:
-        sim = cocktail.similarity(desired_ingredients, undesired_ingredients)
+        sim = cocktail.similarity(desired_ingredients, undesired_ingredients, ingredient_categories)
         if sim > max_sim:
             max_sim, most_similar = sim, cocktail
     return max_sim, most_similar
@@ -80,15 +82,17 @@ def get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail
     return desired_ingredients - (ingredient_set & desired_ingredients), ingredient_set & undesired_ingredients
 
 
-def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories):
+def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, dry_run=False):
+    edit_distance = 0
     missing_desired_ingredients, contained_undesired_ingredients = \
         get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail, desired_ingredients,
                                                                             undesired_ingredients)
-
-    print_solution_status(None, missing_desired_ingredients, contained_undesired_ingredients)
+    if not dry_run:
+        print_solution_status(None, missing_desired_ingredients, contained_undesired_ingredients)
 
     if missing_desired_ingredients or contained_undesired_ingredients:
-        print('Adapting cocktail so that it contains all desired ingredients and no undesired ones.')
+        if not dry_run:
+            print('Adapting cocktail so that it contains all desired ingredients and no undesired ones.')
 
         adapted_cocktail = copy.deepcopy(cocktail)
 
@@ -103,11 +107,12 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                 for contained_undesired_ingredient in contained_undesired_ingredients:
                     if ingredient_categories[missing_desired_ingredient] ==\
                             ingredient_categories[contained_undesired_ingredient]:
-                        print('Since the missing desired ingredient ' + str(missing_desired_ingredient) +
-                              ' and the contained undesired ingredient ' + str(contained_undesired_ingredient)
-                              + ' are of the same category ' + str(ingredient_categories[missing_desired_ingredient]) +
-                              ' we can replace ' + str(contained_undesired_ingredient) + ' by '
-                              + str(missing_desired_ingredient))
+                        if not dry_run:
+                            print('Since the missing desired ingredient ' + str(missing_desired_ingredient) +
+                                  ' and the contained undesired ingredient ' + str(contained_undesired_ingredient)
+                                  + ' are of the same category ' +
+                                  str(ingredient_categories[missing_desired_ingredient]) + ' we can replace ' +
+                                  str(contained_undesired_ingredient) + ' by ' + str(missing_desired_ingredient))
                         hit = True
                         break
                 if hit:
@@ -116,7 +121,10 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                 adapted_cocktail.replace_ingredient(contained_undesired_ingredient, missing_desired_ingredient)
                 missing_desired_ingredients.remove(missing_desired_ingredient)
                 contained_undesired_ingredients.remove(contained_undesired_ingredient)
-                print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+                if not dry_run:
+                    print_solution_status(adapted_cocktail, missing_desired_ingredients,
+                                          contained_undesired_ingredients)
+                edit_distance += 1
             else:
                 break  # need to use another rule
 
@@ -133,11 +141,11 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                     # The second condition determines if optional_ingredient is actually optional.
                     if ingredient_categories[missing_desired_ingredient] == ingredient_categories[optional_ingredient]\
                             and optional_ingredient not in desired_ingredients:
-                        print('Since the missing desired ingredient ' + str(missing_desired_ingredient) +
-                              ' and the optional ingredient ' + str(optional_ingredient)
-                              + ' are of the same category ' + str(ingredient_categories[missing_desired_ingredient]) +
-                              ' we can replace ' + str(optional_ingredient) + ' by '
-                              + str(missing_desired_ingredient))
+                        if not dry_run:
+                            print('Since the missing desired ingredient ' + str(missing_desired_ingredient) +
+                                  ' and the optional ingredient ' + str(optional_ingredient)
+                                  + ' are of the same category ' + ' we can replace ' + str(optional_ingredient) +
+                                  ' by ' + str(missing_desired_ingredient))
                         hit = True
                         break
                 if hit:
@@ -145,36 +153,48 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
             if hit:
                 adapted_cocktail.replace_ingredient(optional_ingredient, missing_desired_ingredient)
                 missing_desired_ingredients.remove(missing_desired_ingredient)
-                print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+                if not dry_run:
+                    print_solution_status(adapted_cocktail, missing_desired_ingredients,
+                                          contained_undesired_ingredients)
+                edit_distance += 1
             else:
                 break  # need to use another rule
 
         # We can replace a contained undesired ingredient by a random ingredient of the same category. At least
         # the category is preserved but there is some risk due to the random choice.
-        # TODO: make sure that the new ingredient is not an undesired one as well..
         while contained_undesired_ingredients:
             contained_undesired_ingredient = contained_undesired_ingredients.pop()
-            random_ingredient = get_random_ingredient_of_same_catgegory(contained_undesired_ingredient,
-                                                                        ingredient_categories)
-            print('We replace the contained undesired ingredient ' + str(contained_undesired_ingredient) +
-                  ' by the random ingredient ' + str(random_ingredient) + ' of the same category ' +
-                  str(ingredient_categories[random_ingredient]))
+            random_ingredient = contained_undesired_ingredient
+            while random_ingredient in undesired_ingredients:
+                random_ingredient = get_random_ingredient_of_same_catgegory(contained_undesired_ingredient,
+                                                                            ingredient_categories)
+            if not dry_run:
+                print('We replace the contained undesired ingredient ' + str(contained_undesired_ingredient) +
+                      ' by the random ingredient ' + str(random_ingredient) + ' of the same category ' +
+                      str(ingredient_categories[random_ingredient]))
             adapted_cocktail.replace_ingredient(contained_undesired_ingredient, random_ingredient)
-            print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+            if not dry_run:
+                print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+            edit_distance += 1
 
         # Now comes the most unfavorable strategy: we just add a little bit of the remaining missing desired ingredients
         # to the cocktail. This is the only operation that changes the number of ingredients and does not respect
         # the category of an ingredient.
         while missing_desired_ingredients:
             missing_desired_ingredient = missing_desired_ingredients.pop()
-            print('We add a little bit of the missing desired ingredient ' + str(missing_desired_ingredient))
+            if not dry_run:
+                print('We add a little bit of the missing desired ingredient ' + str(missing_desired_ingredient))
             unit = 'cl' if ingredient_categories[missing_desired_ingredient] in ['alcoholic', 'nonalcoholic'] else ''
             adapted_cocktail.add_ingredient((missing_desired_ingredient, '1', unit))
-            print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
-        return adapted_cocktail
+            if not dry_run:
+                print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+            edit_distance += 2 # give this more weight because of its very heuristic nature
+        return adapted_cocktail, edit_distance
     else:
-        print('Found cocktail already contains all desired ingredients and no undesired ones, so it can be directly '
-              'used.')
+        if not dry_run:
+            print('Found cocktail already contains all desired ingredients and no undesired ones, so it can be '
+                  'directly used.')
+        return None, 0
 
 
 def print_commands():
@@ -300,15 +320,17 @@ def main():
     desired_ingredients = set(['gin', 'sparkling water', 'anise basil', 'brown sugar',
                                'ice cube', 'lemongrass', 'champagne'])
     undesired_ingredients = set(['white rum', 'lime'])
+    #desired_ingredients = set(['orange juice', 'gin', 'cognac'])
+    #undesired_ingredients = set(['apple liqueur'])
     print('Searching for a cocktail with constraints')
     print("\tdesired ingredients: " + str(desired_ingredients))
     print("\tundesired ingredients: " + str(undesired_ingredients))
-    cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients)[1]
+    cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories)[1]
     print()
     print("Most similar cocktail found:")
     print(cocktail)
     print()
-    adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)
+    adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)[0]
     if adapted_cocktail:
         evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
                           cocktails)
