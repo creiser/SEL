@@ -20,16 +20,23 @@ class Cocktail:
         return sum([1 if x in ingredient_set else 0 for x in desired_ingredients] +
                     [-1 if x in ingredient_set else 0 for x in undesired_ingredients])
 
-    def replace_ingredient(self, old, new):
+    def replace_ingredient(self, old, new, use_old_quantities=True):
         for i, ingredient in enumerate(self.ingredients):
             if ingredient[0] == old:
                 break
-        self.ingredients[i] = (new, self.ingredients[i][1], self.ingredients[i][2])
-        self.title += ' with ' + new + ' instead of ' + old
+        if use_old_quantities:
+            self.ingredients[i] = (new, self.ingredients[i][1], self.ingredients[i][2])
+        else:
+            self.ingredients[i] = new
+        self.title += ' with ' + self.ingredients[i][0] + ' instead of ' + old
 
     def add_ingredient(self, new):
         self.ingredients.append(new)
         self.title += ' and a bit of ' + new[0]
+
+    def remove_ingredient(self, ingredient):
+        self.ingredients = [x for x in self.ingredients if x[0] != ingredient]
+        self.title += ' without ' + ingredient
 
     def get_ingredient_set(self):
         return set([x[0] for x in self.ingredients])
@@ -66,12 +73,17 @@ def get_random_ingredient_of_same_catgegory(ingredient, ingredient_categories):
                                     if x[1] == ingredient_categories[ingredient]]
     return random.choice(ingredients_of_same_category)
 
-def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories):
+
+def get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail, desired_ingredients,
+                                                                        undesired_ingredients):
     ingredient_set = cocktail.get_ingredient_set()
-    desired_ingredients = set(desired_ingredients)
-    undesired_ingredients = set(undesired_ingredients)
-    missing_desired_ingredients = desired_ingredients - (ingredient_set & desired_ingredients)
-    contained_undesired_ingredients = ingredient_set & undesired_ingredients
+    return desired_ingredients - (ingredient_set & desired_ingredients), ingredient_set & undesired_ingredients
+
+
+def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories):
+    missing_desired_ingredients, contained_undesired_ingredients = \
+        get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail, desired_ingredients,
+                                                                            undesired_ingredients)
 
     print_solution_status(None, missing_desired_ingredients, contained_undesired_ingredients)
 
@@ -139,6 +151,7 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
 
         # We can replace a contained undesired ingredient by a random ingredient of the same category. At least
         # the category is preserved but there is some risk due to the random choice.
+        # TODO: make sure that the new ingredient is not an undesired one as well..
         while contained_undesired_ingredients:
             contained_undesired_ingredient = contained_undesired_ingredients.pop()
             random_ingredient = get_random_ingredient_of_same_catgegory(contained_undesired_ingredient,
@@ -158,6 +171,87 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
             unit = 'cl' if ingredient_categories[missing_desired_ingredient] in ['alcoholic', 'nonalcoholic'] else ''
             adapted_cocktail.add_ingredient((missing_desired_ingredient, '1', unit))
             print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+        return adapted_cocktail
+    else:
+        print('Found cocktail already contains all desired ingredients and no undesired ones, so it can be directly '
+              'used.')
+
+
+def print_commands():
+    print('Commands:')
+    print('\tadd ingredient quantity unit: Adds an ingredient to the cocktail.')
+    print('\treplace ingredient new-ingredient quantity unit: Replaces an ingredient in the cocktail.')
+    print('\tremove ingredient: Removes an ingredient from the cocktail.')
+    print('\tsave Saves the edited cocktail to the case base')
+
+
+def evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, cocktails):
+    answer = ''
+    while answer != 'y' and answer != 'n':
+        print('Is this a good cocktail? (y/n)')
+        answer = input()
+    if answer == 'n':
+        print('Manual improvement of the cocktail by an expert.')
+        print('You can edit the cocktail with the following commands, but make sure that it satisfies the constraints')
+        print("\tdesired ingredients: " + str(desired_ingredients))
+        print("\tundesired ingredients: " + str(undesired_ingredients))
+        print_commands()
+        missing_desired_ingredients = contained_undesired_ingredients = set([0])
+        while missing_desired_ingredients or contained_undesired_ingredients:
+            command = ['']
+            while command[0] != 'save':
+                command = input().split()
+                if not command:
+                    command = ['']
+                    continue
+                if command[0] == 'add':
+                    ingredient, quantity, unit = command[1:]
+                    ingredient = ingredient.replace('-', ' ')
+                    unit = unit.replace('none', '')
+                    if ingredient not in ingredient_categories:
+                        print('The ingredient ' + str(ingredient) + ' does not exist.')
+                    else:
+                        adapted_cocktail.add_ingredient((ingredient, quantity, unit))
+                elif command[0] == 'replace':
+                    ingredient, new_ingredient, quantity, unit = command[1:]
+                    ingredient = ingredient.replace('-', ' ')
+                    new_ingredient = new_ingredient.replace('-', ' ')
+                    unit = unit.replace('none', '')
+                    if ingredient not in adapted_cocktail.get_ingredient_set():
+                        print('The cocktail does not contain the ingredient ' + str(ingredient))
+                    else:
+                        if new_ingredient not in ingredient_categories:
+                            print('The ingredient ' + str(new_ingredient) + ' does not exist.')
+                        else:
+                            print('replacing ingredient..')
+                            adapted_cocktail.replace_ingredient(ingredient, (new_ingredient, quantity, unit), False)
+                elif command[0] == 'remove':
+                    ingredient = command[1]
+                    ingredient = ingredient.replace('-', ' ')
+                    if ingredient not in adapted_cocktail.get_ingredient_set():
+                        print('The cocktail does not contain the ingredient ' + str(ingredient))
+                    else:
+                        adapted_cocktail.remove_ingredient(ingredient)
+
+            missing_desired_ingredients, contained_undesired_ingredients = \
+                get_missing_desired_ingredients_and_contained_undesired_ingredients(adapted_cocktail,
+                                                                                    desired_ingredients,
+                                                                                    undesired_ingredients)
+            print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
+            if missing_desired_ingredients or contained_undesired_ingredients:
+                print('Please adapt the cocktail so it contains all desired ingredients and no undesired ones.')
+                print_commands()
+
+    answer = ''
+    while answer != 'y' and answer != 'n':
+        print('Would you like to rename the cocktail? (y/n)')
+        answer = input()
+    if answer == 'y':
+        adapted_cocktail.title = input('Please enter the new title of the cocktail\n')
+
+    print('Saving new cocktail to case base.')
+    cocktails.append(adapted_cocktail)
+
 
 def extract_ingredients(root):
     ingredients = set()
@@ -203,8 +297,9 @@ def main():
 
     cocktails = build_case_base(root)
 
-    desired_ingredients = ['gin', 'sparkling water', 'anise basil', 'brown sugar', 'ice cube', 'lemongrass', 'champagne']
-    undesired_ingredients = ['white rum', 'lime']
+    desired_ingredients = set(['gin', 'sparkling water', 'anise basil', 'brown sugar',
+                               'ice cube', 'lemongrass', 'champagne'])
+    undesired_ingredients = set(['white rum', 'lime'])
     print('Searching for a cocktail with constraints')
     print("\tdesired ingredients: " + str(desired_ingredients))
     print("\tundesired ingredients: " + str(undesired_ingredients))
@@ -213,7 +308,10 @@ def main():
     print("Most similar cocktail found:")
     print(cocktail)
     print()
-    adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)
+    adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)
+    if adapted_cocktail:
+        evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
+                          cocktails)
 
 if __name__ == '__main__':
     main()
