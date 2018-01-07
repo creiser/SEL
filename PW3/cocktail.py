@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import sys
 import copy
 import random
-
+import os.path
 
 class Cocktail:
     def __init__(self, title, ingredients, success):
@@ -294,7 +294,7 @@ def load_ingredient_categories():
     return ingredient_categories
 
 
-def build_case_base(root):
+def load_official_case_base(root):
     # Extract all cocktails
     cocktails = []
     for recipe in root:
@@ -302,38 +302,91 @@ def build_case_base(root):
         for ingredient in recipe.find('ingredients'):
             ingredients.append((ingredient.attrib['food'].lower(),
                                 ingredient.attrib['quantity'],
-                                ingredient.attrib['unit'], True))
+                                ingredient.attrib['unit']))
         cocktails.append(Cocktail(recipe.find('title').text, ingredients, True))
     return cocktails
 
 
-def main():
-    # Load case base
-    tree = ET.parse('ccc_cocktails.xml')
-    root = tree.getroot()
+def save_case_base(cocktails):
+    root = ET.Element('cocktails')
+    for cocktail in cocktails:
+        cocktail_element = ET.SubElement(root, 'cocktail')
+        cocktail_element.attrib['title'] = cocktail.title
+        for ingredient in cocktail.ingredients:
+            ingredient_element = ET.SubElement(cocktail_element, 'ingredient')
+            ingredient_element.attrib['food'], ingredient_element.attrib['quantity'],\
+            ingredient_element.attrib['unit'] = ingredient
+    ET.ElementTree(root).write('case_base.xml')
 
-    extract_ingredients(root)
+
+def load_case_base():
+    cocktails = []
+    root = ET.parse('case_base.xml').getroot()
+    for cocktail_element in root:
+        ingredients = []
+        for ingredient_element in cocktail_element:
+            ingredients.append((ingredient_element.attrib['food'], ingredient_element.attrib['quantity'],
+                                ingredient_element.attrib['unit']))
+        cocktails.append(Cocktail(cocktail_element.attrib['title'], ingredients, True))
+    return cocktails
+
+
+def main():
+    # Check if we have already established our own case base (with our own cocktails)
+    if os.path.isfile('case_base.xml'):
+        print('Load our case base.')
+        cocktails = load_case_base()
+    else:
+        # Load official case base: the case base that is provided by the challenge
+        print('Load official case base.')
+        official_case_base_root = ET.parse('ccc_cocktails.xml').getroot()
+        cocktails = load_official_case_base(official_case_base_root)
+        # Extract all ingredients from the official case base
+        extract_ingredients(official_case_base_root)
+
     ingredient_categories = load_ingredient_categories()
 
-    cocktails = build_case_base(root)
+    while True:
+        print('Please enter all desired ingredients as a space separated list. Substitute spaces in the ingredient\'s '
+              'name by dashes. Enter "exit" to terminate the application.')
+        desired_ingredients_with_not_existing = set([x.replace('-', ' ') for x in input().split()])
+        desired_ingredients = copy.copy(desired_ingredients_with_not_existing)
+        for desired_ingredient in desired_ingredients_with_not_existing:
+            if desired_ingredient not in ingredient_categories and desired_ingredient != 'exit':
+                print('Warning: The ingredient ' + str(desired_ingredient) + ' does not exist and will be ignored.')
+                desired_ingredients.remove(desired_ingredient)
 
-    desired_ingredients = set(['gin', 'sparkling water', 'anise basil', 'brown sugar',
-                               'ice cube', 'lemongrass', 'champagne'])
-    undesired_ingredients = set(['white rum', 'lime'])
-    #desired_ingredients = set(['orange juice', 'gin', 'cognac'])
-    #undesired_ingredients = set(['apple liqueur'])
-    print('Searching for a cocktail with constraints')
-    print("\tdesired ingredients: " + str(desired_ingredients))
-    print("\tundesired ingredients: " + str(undesired_ingredients))
-    cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories)[1]
-    print()
-    print("Most similar cocktail found:")
-    print(cocktail)
-    print()
-    adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)[0]
-    if adapted_cocktail:
-        evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
-                          cocktails)
+        if 'exit' in desired_ingredients:
+            break
+
+        print('Please enter all undesired ingredients as a space separated list.')
+        undesired_ingredients_with_not_existing = set([x.replace('-', ' ') for x in input().split()])
+        undesired_ingredients = copy.copy(undesired_ingredients_with_not_existing)
+        for undesired_ingredient in undesired_ingredients_with_not_existing:
+            if undesired_ingredient not in ingredient_categories:
+                print('Warning: The ingredient ' + str(undesired_ingredient) + ' does not exist and will be ignored.')
+                undesired_ingredients.remove(undesired_ingredient)
+
+
+        #desired_ingredients = set(['gin', 'sparkling water', 'anise basil', 'brown sugar',
+        #                           'ice cube', 'lemongrass', 'champagne'])
+        #undesired_ingredients = set(['white rum', 'lime'])
+        #desired_ingredients = set(['orange juice', 'gin', 'cognac'])
+        #undesired_ingredients = set(['apple liqueur'])
+        print('Searching for a cocktail with constraints')
+        print("\tdesired ingredients: " + str(desired_ingredients))
+        print("\tundesired ingredients: " + str(undesired_ingredients))
+        cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories)[1]
+        print()
+        print("Most similar cocktail found:")
+        print(cocktail)
+        print()
+        adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)[0]
+        if adapted_cocktail:
+            evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
+                              cocktails)
+        save_case_base(cocktails)
+
 
 if __name__ == '__main__':
     main()
