@@ -237,7 +237,7 @@ def evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredien
 
 def main():
     # Check if we have already established our own case base (with our own cocktails)
-    if os.path.isfile('case_base.xml'):
+    if os.path.isfile('../Data/case_base.xml'):
         print('Load our case base.')
         cocktails = casebase.load_case_base()
     else:
