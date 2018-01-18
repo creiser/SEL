@@ -14,6 +14,7 @@ def get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients
 
 def find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories):
     max_sim, most_similar = -sys.maxsize - 1, None
+    # Do a full search in the flat case base.
     for cocktail in cocktails:
         sim = get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)
         if sim > max_sim:
@@ -215,6 +216,7 @@ def evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredien
                     else:
                         adapted_cocktail.remove_ingredient(ingredient)
 
+            # Make sure that the expert adapted the cocktail in a way that still matches the query.
             missing_desired_ingredients, contained_undesired_ingredients = \
                 get_missing_desired_ingredients_and_contained_undesired_ingredients(adapted_cocktail,
                                                                                     desired_ingredients,
@@ -241,7 +243,7 @@ def main():
         print('Load our case base.')
         cocktails = casebase.load_case_base()
     else:
-        # Load official case base: the case base that is provided by the challenge
+        # Otherwise load official case base: the case base that is provided by the challenge
         print('Load official case base.')
         cocktails = casebase.load_official_case_base()
         # Extract all ingredients from the official case base
@@ -285,6 +287,7 @@ def main():
         print(cocktail)
         print()
         adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)[0]
+        # The cocktail must only be evaluated by an expert if it some adaptation was necessary.
         if adapted_cocktail:
             evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
                               cocktails)
