@@ -7,14 +7,12 @@ class Cocktail:
         self.ingredients = ingredients
         self.success = success  # currently unused, but could be useful for "Learning from failure"
 
-    def replace_ingredient(self, old, new, use_old_quantities=True):
+    def replace_ingredient(self, old, new):
         for i, ingredient in enumerate(self.ingredients):
             if ingredient[0] == old:
                 break
-        if use_old_quantities:
-            self.ingredients[i] = (new, self.ingredients[i][1], self.ingredients[i][2])
-        else:
-            self.ingredients[i] = new
+        rest = self.ingredients[i][len(new):]
+        self.ingredients[i] = new + rest if type(rest) is tuple else (rest, )
         self.title += ' with ' + self.ingredients[i][0] + ' instead of ' + old
 
     def add_ingredient(self, new):
@@ -27,6 +25,9 @@ class Cocktail:
 
     def get_ingredient_set(self):
         return set([x[0] for x in self.ingredients])
+
+    def get_ingredient_quantity(self, ingredient):
+        return [x[1] for x in self.ingredients if x[0] == ingredient][0]
 
     def __str__(self):
         out = self.title + '\n'

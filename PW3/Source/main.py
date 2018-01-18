@@ -5,18 +5,20 @@ import sys
 import casebase
 
 
-def get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories):
+def get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, alcohol_contents):
     if not cocktail.success:
         return -sys.maxsize - 1
     # We use dry runs of the adapt_solution method to calculate an edit distance.
-    return -adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, True)[1]
+    return -adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
+                           alcohol_contents, True)[1]
 
 
-def find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories):
+def find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories, alcohol_contents):
     max_sim, most_similar = -sys.maxsize - 1, None
     # Do a full search in the flat case base.
     for cocktail in cocktails:
-        sim = get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)
+        sim = get_similarity_to_query(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
+                                      alcohol_contents)
         if sim > max_sim:
             max_sim, most_similar = sim, cocktail
     return max_sim, most_similar
@@ -45,7 +47,21 @@ def get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail
     return desired_ingredients - (ingredient_set & desired_ingredients), ingredient_set & undesired_ingredients
 
 
-def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, dry_run=False):
+def replace_ingredient_and_adjust_quantity(adapted_cocktail, old, new, ingredient_categories, alcohol_contents):
+    if ingredient_categories[old] == 'alcoholic':
+        old_quantity = adapted_cocktail.get_ingredient_quantity(old)
+        new_quantity = str(round(float(old_quantity) * float(alcohol_contents[old]) / float(alcohol_contents[new])))
+        print('Since the alcoholic ingredient ' + old + ' with alcohol content ' + alcohol_contents[old] + '% is '
+              'replaced by the alcoholic ingredient ' + new + ' with alcohol content ' + alcohol_contents[new] + '% '
+              ' the quantity of the new ingredient is adapted such that the alcohol level of the cocktail stays '
+              'approximately the same. Old quantity: ' + old_quantity + ' New quantity: ' + new_quantity)
+        new = (new, new_quantity)
+    else:
+        new = (new, )
+    adapted_cocktail.replace_ingredient(old, new)
+
+
+def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories, alcohol_contents, dry_run=False):
     edit_distance = 0
     missing_desired_ingredients, contained_undesired_ingredients = \
         get_missing_desired_ingredients_and_contained_undesired_ingredients(cocktail, desired_ingredients,
@@ -81,7 +97,9 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                 if hit:
                     break
             if hit:
-                adapted_cocktail.replace_ingredient(contained_undesired_ingredient, missing_desired_ingredient)
+                replace_ingredient_and_adjust_quantity(adapted_cocktail, contained_undesired_ingredient,
+                                                       missing_desired_ingredient, ingredient_categories,
+                                                       alcohol_contents)
                 missing_desired_ingredients.remove(missing_desired_ingredient)
                 contained_undesired_ingredients.remove(contained_undesired_ingredient)
                 if not dry_run:
@@ -114,7 +132,9 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                 if hit:
                     break
             if hit:
-                adapted_cocktail.replace_ingredient(optional_ingredient, missing_desired_ingredient)
+                replace_ingredient_and_adjust_quantity(adapted_cocktail, optional_ingredient,
+                                                       missing_desired_ingredient, ingredient_categories,
+                                                       alcohol_contents)
                 missing_desired_ingredients.remove(missing_desired_ingredient)
                 if not dry_run:
                     print_solution_status(adapted_cocktail, missing_desired_ingredients,
@@ -135,7 +155,9 @@ def adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredi
                 print('We replace the contained undesired ingredient ' + str(contained_undesired_ingredient) +
                       ' by the random ingredient ' + str(random_ingredient) + ' of the same category ' +
                       str(ingredient_categories[random_ingredient]))
-            adapted_cocktail.replace_ingredient(contained_undesired_ingredient, random_ingredient)
+            replace_ingredient_and_adjust_quantity(adapted_cocktail, contained_undesired_ingredient,
+                                                   random_ingredient, ingredient_categories,
+                                                   alcohol_contents)
             if not dry_run:
                 print_solution_status(adapted_cocktail, missing_desired_ingredients, contained_undesired_ingredients)
             edit_distance += 1
@@ -206,8 +228,7 @@ def evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredien
                         if new_ingredient not in ingredient_categories:
                             print('The ingredient ' + str(new_ingredient) + ' does not exist.')
                         else:
-                            print('replacing ingredient..')
-                            adapted_cocktail.replace_ingredient(ingredient, (new_ingredient, quantity, unit), False)
+                            adapted_cocktail.replace_ingredient(ingredient, (new_ingredient, quantity, unit))
                 elif command[0] == 'remove':
                     ingredient = command[1]
                     ingredient = ingredient.replace('-', ' ')
@@ -249,7 +270,7 @@ def main():
         # Extract all ingredients from the official case base
         casebase.extract_ingredients()
 
-    ingredient_categories = casebase.load_ingredient_categories()
+    ingredient_categories, alcohol_contents = casebase.load_ingredient_categories_and_alcohol_contents()
 
     while True:
         print('Please enter all desired ingredients as a space separated list. Substitute spaces in the ingredient\'s '
@@ -278,15 +299,19 @@ def main():
         #undesired_ingredients = set(['white rum', 'lime'])
         #desired_ingredients = set(['orange juice', 'gin', 'cognac'])
         #undesired_ingredients = set(['apple liqueur'])
+        #desired_ingredients = set(['lemonade', 'passion fruit syrup', 'lemon juice', 'ice cube', 'malibu rum'])
+        #undesired_ingredients = set()
         print('Searching for a cocktail with constraints')
         print("\tdesired ingredients: " + str(desired_ingredients))
         print("\tundesired ingredients: " + str(undesired_ingredients))
-        cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories)[1]
+        cocktail = find_most_similar(cocktails, desired_ingredients, undesired_ingredients, ingredient_categories,
+                                     alcohol_contents)[1]
         print()
         print("Most similar cocktail found:")
         print(cocktail)
         print()
-        adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories)[0]
+        adapted_cocktail = adapt_solution(cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,
+                                          alcohol_contents)[0]
         # The cocktail must only be evaluated by an expert if it some adaptation was necessary.
         if adapted_cocktail:
             evaluate_solution(adapted_cocktail, desired_ingredients, undesired_ingredients, ingredient_categories,

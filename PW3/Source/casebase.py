@@ -25,11 +25,14 @@ def extract_ingredients():
     ET.ElementTree(top_level_element).write("../Data/categories_raw.xml")
 
 
-def load_ingredient_categories():
+def load_ingredient_categories_and_alcohol_contents():
     ingredient_categories = {}
+    alcohol_contents = {}
     for ingredient in ET.parse('../Data/categories.xml').getroot():
         ingredient_categories[ingredient.attrib['food']] = ingredient.attrib['category']
-    return ingredient_categories
+        if ingredient.attrib['category'] == 'alcoholic':
+            alcohol_contents[ingredient.attrib['food']] = ingredient.attrib['alcoholContent']
+    return ingredient_categories, alcohol_contents
 
 
 def load_official_case_base():

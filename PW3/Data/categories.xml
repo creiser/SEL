@@ -2,101 +2,101 @@
     <ingredient category="nonalcoholic" food="multivitamin juice"/>
     <ingredient category="nonalcoholic" food="whole milk"/>
     <ingredient category="nonalcoholic" food="rice milk"/>
-    <ingredient category="alcoholic" food="angostura bitter"/>
+    <ingredient category="alcoholic" alcoholContent="45" food="angostura bitter"/>
     <ingredient category="special" food="sour cream"/>
     <ingredient category="special" food="salt"/>
     <ingredient category="fruit" food="banana"/>
     <ingredient category="fruit" food="currant"/>
     <ingredient category="special" food="brown sugar"/>
-    <ingredient category="alcoholic" food="white martini"/>
+    <ingredient category="alcoholic" alcoholContent="37" food="white martini"/>
     <ingredient category="nonalcoholic" food="tamarin juice"/>
     <ingredient category="nonalcoholic" food="water"/>
-    <ingredient category="alcoholic" food="white rum"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="white rum"/>
     <ingredient category="special" food="worcestershire sauce"/>
-    <ingredient category="alcoholic" food="get_27"/>
+    <ingredient category="alcoholic" alcoholContent="21" food="get_27"/>
     <ingredient category="nonalcoholic" food="peach juice"/>
     <ingredient category="nonalcoholic" food="lemonade"/>
     <ingredient category="special" food="lemon syrup"/>
     <ingredient category="special" food="wasabi"/>
     <ingredient category="nonalcoholic" food="apricot juice"/>
     <ingredient category="fruit" food="lemon"/>
-    <ingredient category="alcoholic" food="tequila"/>
+    <ingredient category="alcoholic" alcoholContent="38" food="tequila"/>
     <ingredient category="special" food="coffee liqueur"/>
     <ingredient category="special" food="cane sugar syrup"/>
     <ingredient category="special" food="peach syrup"/>
     <ingredient category="fruit" food="lemon slice"/>
     <ingredient category="special" food="nutmeg"/>
     <ingredient category="special" food="celery salt"/>
-    <ingredient category="alcoholic" food="dark rum"/>
-    <ingredient category="alcoholic" food="amber rum"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="dark rum"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="amber rum"/>
     <ingredient category="fruit" food="clementine orange"/>
     <ingredient category="nonalcoholic" food="juice"/>
     <ingredient category="special" food="currant syrup"/>
-    <ingredient category="alcoholic" food="hard cider"/>
+    <ingredient category="alcoholic" alcoholContent="10" food="hard cider"/>
     <ingredient category="fruit" food="grapefruit"/>
     <ingredient category="special" food="powdered sugar"/>
     <ingredient category="nonalcoholic" food="soda water"/>
     <ingredient category="special" food="coriander"/>
     <ingredient category="nonalcoholic" food="soft drink"/>
-    <ingredient category="alcoholic" food="litchi liqueur"/>
-    <ingredient category="alcoholic" food="grand marnier"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="litchi liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="grand marnier"/>
     <ingredient category="fruit" food="kiwi fruit"/>
-    <ingredient category="alcoholic" food="plum brandy"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="plum brandy"/>
     <ingredient category="special" food="tabasco sauce"/>
-    <ingredient category="alcoholic" food="lemon liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="lemon liqueur"/>
     <ingredient category="nonalcoholic" food="berry juice"/>
     <ingredient category="special" food="sugar"/>
-    <ingredient category="alcoholic" food="liqueur"/>
-    <ingredient category="alcoholic" food="whiskey"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="whiskey"/>
     <ingredient category="nonalcoholic" food="grape juice"/>
     <ingredient category="nonalcoholic" food="pear juice"/>
     <ingredient category="nonalcoholic" food="sparkling water"/>
-    <ingredient category="alcoholic" food="pear liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="pear liqueur"/>
     <ingredient category="fruit" food="litchi"/>
     <ingredient category="nonalcoholic" food="pineapple juice"/>
-    <ingredient category="alcoholic" food="calvados"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="calvados"/>
     <ingredient category="fruit" food="orange"/>
     <ingredient category="special" food="ice cream"/>
-    <ingredient category="alcoholic" food="beer"/>
+    <ingredient category="alcoholic" alcoholContent="5" food="beer"/>
     <ingredient category="special" food="creme de cafe"/>
-    <ingredient category="alcoholic" food="apple liqueur"/>
-    <ingredient category="alcoholic" food="vodka"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="apple liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="vodka"/>
     <ingredient category="nonalcoholic" food="apple juice"/>
-    <ingredient category="alcoholic" food="rum"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="rum"/>
     <ingredient category="special" food="cinnamon"/>
-    <ingredient category="alcoholic" food="kirsch"/>
+    <ingredient category="alcoholic" alcoholContent="38" food="kirsch"/>
     <ingredient category="fruit" food="blackcurrant"/>
     <ingredient category="special" food="sangria syrup"/>
-    <ingredient category="alcoholic" food="gin"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="gin"/>
     <ingredient category="nonalcoholic" food="schweppes"/>
     <ingredient category="special" food="light whipping cream"/>
     <ingredient category="special" food="mint syrup"/>
     <ingredient category="special" food="fruit syrup"/>
     <ingredient category="nonalcoholic" food="banana juice"/>
-    <ingredient category="alcoholic" food="apple cider"/>
+    <ingredient category="alcoholic" alcoholContent="10" food="apple cider"/>
     <ingredient category="nonalcoholic" food="manguo juice"/>
-    <ingredient category="alcoholic" food="martini"/>
+    <ingredient category="alcoholic" alcoholContent="37" food="martini"/>
     <ingredient category="fruit" food="raspberry"/>
-    <ingredient category="alcoholic" food="dry white wine"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="dry white wine"/>
     <ingredient category="fruit" food="apple"/>
     <ingredient category="special" food="orange syrup"/>
     <ingredient category="fruit" food="melon"/>
     <ingredient category="special" food="orgeat"/>
-    <ingredient category="alcoholic" food="noilly prat"/>
+    <ingredient category="alcoholic" alcoholContent="18" food="noilly prat"/>
     <ingredient category="special" food="granulated sugar"/>
     <ingredient category="nonalcoholic" food="cranberry juice"/>
-    <ingredient category="alcoholic" food="vermouth"/>
+    <ingredient category="alcoholic" alcoholContent="15" food="vermouth"/>
     <ingredient category="fruit" food="lime zest"/>
-    <ingredient category="alcoholic" food="porto"/>
+    <ingredient category="alcoholic" alcoholContent="19" food="porto"/>
     <ingredient category="nonalcoholic" food="strawberry juice"/>
     <ingredient category="fruit" food="berry"/>
-    <ingredient category="alcoholic" food="champagne"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="champagne"/>
     <ingredient category="special" food="vanilla sugar"/>
-    <ingredient category="alcoholic" food="malibu rum"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="malibu rum"/>
     <ingredient category="fruit" food="strawberry"/>
-    <ingredient category="alcoholic" food="rice wine"/>
-    <ingredient category="alcoholic" food="benedictine"/>
-    <ingredient category="alcoholic" food="prosecco"/>
+    <ingredient category="alcoholic" alcoholContent="20" food="rice wine"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="benedictine"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="prosecco"/>
     <ingredient category="nonalcoholic" food="coca-cola"/>
     <ingredient category="special" food="ice cube"/>
     <ingredient category="special" food="pepper"/>
@@ -112,48 +112,48 @@
     <ingredient category="special" food="syrup"/>
     <ingredient category="special" food="creme de cassis"/>
     <ingredient category="special" food="coffee"/>
-    <ingredient category="alcoholic" food="noilly_prat"/>
+    <ingredient category="alcoholic" alcoholContent="18" food="noilly_prat"/>
     <ingredient category="fruit" food="kumquat"/>
     <ingredient category="fruit" food="coconut"/>
     <ingredient category="nonalcoholic" food="lime juice"/>
     <ingredient category="special" food="anise basil"/>
-    <ingredient category="alcoholic" food="pisang ambon"/>
+    <ingredient category="alcoholic" alcoholContent="21" food="pisang ambon"/>
     <ingredient category="nonalcoholic" food="grapefruit juice"/>
-    <ingredient category="alcoholic" food="apricot liqueur"/>
-    <ingredient category="alcoholic" food="white wine"/>
-    <ingredient category="alcoholic" food="stout"/>
+    <ingredient category="alcoholic" alcoholContent="30" food="apricot liqueur"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="white wine"/>
+    <ingredient category="alcoholic" alcoholContent="7" food="stout"/>
     <ingredient category="nonalcoholic" food="sparkling mineral water"/>
     <ingredient category="special" food="mint"/>
     <ingredient category="nonalcoholic" food="orange juice"/>
-    <ingredient category="alcoholic" food="red martini"/>
+    <ingredient category="alcoholic" alcoholContent="37" food="red martini"/>
     <ingredient category="special" food="lemongrass"/>
-    <ingredient category="alcoholic" food="pastis"/>
-    <ingredient category="alcoholic" food="triple sec"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="pastis"/>
+    <ingredient category="alcoholic" alcoholContent="30" food="triple sec"/>
     <ingredient category="special" food="crushed ice"/>
-    <ingredient category="alcoholic" food="campari"/>
-    <ingredient category="alcoholic" food="cr&#233;mant"/>
+    <ingredient category="alcoholic" alcoholContent="21" food="campari"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="cr&#233;mant"/>
     <ingredient category="nonalcoholic" food="passion fruit juice"/>
-    <ingredient category="alcoholic" food="blue curacao"/>
-    <ingredient category="alcoholic" food="cacha&#231;a"/>
+    <ingredient category="alcoholic" alcoholContent="25" food="blue curacao"/>
+    <ingredient category="alcoholic" alcoholContent="54" food="cacha&#231;a"/>
     <ingredient category="special" food="pistachio nut"/>
     <ingredient category="special" food="egg"/>
-    <ingredient category="alcoholic" food="sparkling wine"/>
+    <ingredient category="alcoholic" alcoholContent="14" food="sparkling wine"/>
     <ingredient category="fruit" food="pineapple"/>
     <ingredient category="nonalcoholic" food="cherry juice"/>
-    <ingredient category="alcoholic" food="blush wine"/>
+    <ingredient category="alcoholic" alcoholContent="12" food="blush wine"/>
     <ingredient category="nonalcoholic" food="litchi juice"/>
     <ingredient category="fruit" food="apricot"/>
     <ingredient category="special" food="grenadine"/>
     <ingredient category="special" food="brown_sugar"/>
     <ingredient category="special" food="mangalore"/>
-    <ingredient category="alcoholic" food="cava"/>
-    <ingredient category="alcoholic" food="cointreau"/>
+    <ingredient category="alcoholic" alcoholContent="13" food="cava"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="cointreau"/>
     <ingredient category="fruit" food="lemon zest"/>
     <ingredient category="special" food="ginger"/>
     <ingredient category="nonalcoholic" food="lemon juice"/>
     <ingredient category="fruit" food="lime"/>
     <ingredient category="special" food="cane sugar"/>
-    <ingredient category="alcoholic" food="cognac"/>
+    <ingredient category="alcoholic" alcoholContent="40" food="cognac"/>
     <ingredient category="fruit" food="citrus fruit"/>
     <ingredient category="nonalcoholic" food="guava juice"/>
 </ingredients>
